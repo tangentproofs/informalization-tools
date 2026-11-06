@@ -50,7 +50,7 @@ The Lean is always the ground truth. The English is a guide to it, and the site 
 | `engine/tools/srcrefs_lock.py` | optional: lock "File.lean lines a–b" references to the text they cite, and re-point them after the Lean changes (needs full repo paths in references) |
 | `tools/` | hub tools: `update.mjs` renders the hub page from `projects.json` + `hub.json`; `sync_projects.py` records node counts; `mktask.py` prints a drafting task message; `leakcheck.py` finds verbatim source lines in a no-licence site's text |
 | `templates/` | `hub.json`, `projects.json`, a site skeleton (`site/`), hub page CSS and favicon, and the Pages workflow |
-| `examples/b4-lean/` | a complete site config with 30 nodes and a Roadmap page (an explainer of [tangentstorm/b4](https://github.com/tangentstorm/b4)'s Lean code, shown with its author's permission) |
+| `examples/rakesieve/` | a complete worked example: the site config, 69 nodes and the About/Review/Trust pages of [RakeSieve, explained](https://tangentproofs.github.io/rakesieve/learn/), for [tangentproofs/rakesieve](https://github.com/tangentproofs/rakesieve) (MIT), a prime sieve with both mathematical proofs (infinitude of primes as a corollary) and proofs about the program (every step emits the next prime) |
 | `prompts/` | the briefs given to Claude for drafting, review passes and the honesty audit |
 | `docs/` | `CONVENTIONS.md` (the rules for a proof site) and `GUIDE.md` (background) |
 | `skill/proof-site/SKILL.md` | the step-by-step agent procedure |
@@ -70,6 +70,33 @@ The Lean is always the ground truth. The English is a guide to it, and the site 
   non-Lean projects), `sourceRoots`/`sourceExts` (which files the source pages render), `ownProject`
   (banner wording for the hub owner's own project), `snapshot` (explain a public website instead of a repo).
 - **`sites/<slug>/pages/roadmap.md`**: if present, the site gets a Roadmap tab.
+- **Scanner options** in `site.json` (all off by default; the RakeSieve example uses them):
+  `indentedDecls` (read declarations indented inside a `section`), `instanceNames: "lean"` (name anonymous
+  instances the way Lean does, e.g. `instPrimeGenPrimeSieve`, instead of `instance_<line>`), `shortDefBodies`
+  (show definitions under 6 lines with their body), `manualEdges` (`{"proofDeps": {id: [ids]}, "meaningDeps":
+  {id: [ids]}}` for links the text scan can't see, such as a theorem that goes through a type class
+  instance), `sectionVariables` (`{id: ["(α : Type)", "[C α]"]}`, the `variable`s in scope), `nodeAuthors`
+  (default `authors` on every node), and `writtenBy` / `writtenByAbout` (who drafted the text, for the footer
+  and the About page's credit section).
+
+## Try it: build the RakeSieve example
+
+```sh
+git clone https://github.com/tangentproofs/informalization-tools hub && cd hub
+cp templates/hub.json hub.json                 # edit name, baseUrl, repo
+mkdir -p sites projects
+cp -r examples/rakesieve sites/
+git clone https://github.com/tangentproofs/rakesieve projects/tangentproofs-rakesieve
+git -C projects/tangentproofs-rakesieve checkout 1c165f93c0292f2c52f88c5325faabbdfbcfbc7e
+(cd engine && npm ci) && pip install pyyaml
+engine/build.sh rakesieve                      # -> _site/rakesieve/
+python3 -m http.server -d _site 8765           # open http://localhost:8765/rakesieve/
+```
+
+RakeSieve is a good first example: the mathematics is simple (primes, crossing out multiples), and it has
+both kinds of proof. Some are mathematical: there are infinitely many primes, obtained as a corollary of the
+sieve never running empty. Others are about the program: every step of the sieve emits the next prime, none
+skipped. Its Review page labels the one circular route (`SimpleGen` assumes Euclid) instead of hiding it.
 
 ## Running it on a new repo
 
@@ -79,7 +106,8 @@ The Lean is always the ground truth. The English is a guide to it, and the site 
 # 2. add the project as a pinned submodule
 git submodule add https://github.com/OWNER/REPO projects/owner-repo
 git -C projects/owner-repo checkout <sha>
-# 3. a projects.json entry, and sites/<slug>/ from templates/site/ (rename site.json.todo when ready)
+# 3. a projects.json entry, and sites/<slug>/ from templates/site/ (rename site.json.todo when ready;
+#    examples/rakesieve/ shows a finished one)
 # 4. draft: give a Claude session prompts/draft-explainer.md (as sites/AUTHORING.md) and
 python3 tools/mktask.py <slug>
 # 5. build until it passes
@@ -123,4 +151,4 @@ extract declarations from a Lean build with `ExtractDecls.lean`, which is not in
 
 ## License
 
-MIT. See [LICENSE](LICENSE). The b4 example's text describes code by its author, shown with permission.
+MIT. See [LICENSE](LICENSE). The RakeSieve example's text explains tangentproofs/rakesieve, which is also MIT.

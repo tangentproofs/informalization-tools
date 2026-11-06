@@ -1,0 +1,174 @@
+{
+ "slug": "rakesieve",
+ "repo": "tangentproofs/rakesieve",
+ "submodule": "projects/tangentproofs-rakesieve",
+ "sha": "1c165f93c0292f2c52f88c5325faabbdfbcfbc7e",
+ "members": [
+  "Michal Wallace"
+ ],
+ "authors": "Michal Wallace",
+ "authorUrl": "https://github.com/tangentstorm",
+ "license": {
+  "spdx": "MIT",
+  "name": "MIT License",
+  "file": "LICENSE"
+ },
+ "title": "RakeSieve, explained",
+ "brand": "rake<span>sieve</span> <em>explained</em>",
+ "h1": "RakeSieve: a prime sieve checked in Lean 4",
+ "lead": "The sieve never runs empty, and it proves this itself. When it crosses out the multiples of its next prime c, the number c + d is always left over, where d is the product of the primes found so far. So \"there are infinitely many primes\" comes out as a corollary of the algorithm, with no appeal to Mathlib's proof of it. It is still Euclid's idea (c + p# in place of p# + 1), now carried by the data structure. Lean also checks that every step emits the next prime with none skipped, and that every prime is reached. <a href=\"#/review\">Read the review →</a>",
+ "desc": "A plain-English reading of RakeSieve, a Lean 4 prime sieve built from arithmetic sequences that proves it never runs empty, so infinitude of primes falls out of the algorithm.",
+ "startNote": "<p>The headline: <b>the sieve never runs empty.</b> After it crosses out the multiples of its candidate c, the number c + d survives, where d (the rake's period) is the product of the primes sifted so far. So infinitude of primes is a corollary of the algorithm, not an input to it. This is Euclid's p# + 1 idea carried by the data structure, not an imported theorem: no Mathlib infinitude result is used (see <a href=\"#/trust\">Trust</a>). Seven theorems are exported in <code>Results.lean</code>. The cards below show the sieve's own guarantees first (never empty, each step, every prime), then the infinitude corollary. After those come the generic driver instance that every step goes through, the conditional version for any prime generator, and the two base-case facts. The old brute-force <code>SimpleGen</code> route assumed Euclid and is now kept only as a circular reference spec (see <a href=\"#/review\">the review</a>).</p><p><b>R stands for <i>residue</i>.</b> In the statements below, <code>R p</code> is the set of numbers ≥ 2 that no prime ≤ p divides: what is left after crossing out the multiples of every prime up to p. So <code>R 2</code> is the odd numbers from 3 up, and the sieve's next prime is always the least element of <code>R p</code> (<a href=\"#/node/R\">more on R</a>).</p>",
+ "sizeNote": "The whole library is about 1,400 lines of Lean in 10 built files.",
+ "agentCtx": "RakeSieve: arithmetic sequences, \"rakes\", and a prime sieve built from them, with a proof that it yields consecutive primes",
+ "roots": [
+  "PrimeGen.lean",
+  "PrimeSieve.lean",
+  "ASeq.lean",
+  "Rake.lean",
+  "RakeMap.lean",
+  "RakeSieve.lean",
+  "Results.lean",
+  "SimpleGen.lean",
+  "NoEuclidCheck.lean",
+  "Main.lean"
+ ],
+ "ns": "",
+ "headlines": [
+  "results_rakeSieve_never_empty",
+  "results_rakeSieve_step",
+  "results_rakeSieve_emits_every_prime",
+  "results_exists_prime_gt_of_rakeSieve",
+  "instPrimeGenPrimeSieve",
+  "results_exists_prime_gt_of_primeGen",
+  "results_three_mem_R_two",
+  "results_three_le_of_mem_R_two"
+ ],
+ "mathlibNamespaces": [
+  "Nat",
+  "List",
+  "Subtype",
+  "Function",
+  "Std"
+ ],
+ "mathlibNames": [
+  "Nat",
+  "Set",
+  "List",
+  "Subtype",
+  "Fin",
+  "Bool",
+  "Prop",
+  "Dvd",
+  "Repr",
+  "Ord",
+  "LT",
+  "LE",
+  "Coe",
+  "ToString",
+  "Inhabited",
+  "Option",
+  "IO",
+  "exists_apply_eq_apply"
+ ],
+ "gloss": {
+  "Nat.Prime": "<code>Nat.Prime p</code>: p is a prime natural number (p ≥ 2 and its only divisors are 1 and p).",
+  "Nat": "<code>Nat</code> (ℕ): the natural numbers 0, 1, 2, …",
+  "Set": "<code>Set Nat</code>: a set of natural numbers, written <code>{ n | … }</code>; <code>n ∈ S</code> is membership.",
+  "Nat.exists_infinite_primes": "<code>Nat.exists_infinite_primes n : ∃ p, n ≤ p ∧ Nat.Prime p</code>: Euclid's theorem as Mathlib states it. The RakeSieve headlines do not use it (see Trust); only the circular reference generator SimpleGen does.",
+  "Nat.find": "<code>Nat.find h</code>: the least n satisfying a decidable property, given a proof <code>h</code> that one exists."
+ },
+ "headlineFiles": [
+  "Results.lean",
+  "RakeSieve.lean"
+ ],
+ "sourceRoots": [
+  "PrimeGen.lean",
+  "PrimeSieve.lean",
+  "ASeq.lean",
+  "Rake.lean",
+  "RakeMap.lean",
+  "RakeSieve.lean",
+  "Results.lean",
+  "SimpleGen.lean",
+  "NoEuclidCheck.lean",
+  "Main.lean",
+  "Rake_gte.lean",
+  "OldMain.lean",
+  "lakefile.lean"
+ ],
+ "nodeAuthors": [
+  "grok-bot"
+ ],
+ "instanceNames": "lean",
+ "indentedDecls": true,
+ "shortDefBodies": true,
+ "writtenBy": "drafted by Grok Bot (AI), not yet reviewed",
+ "writtenByAbout": "Grok Bot (AI)",
+ "manualEdges": {
+  "meaningDeps": {
+   "PrimeSieve": [
+    "PrimeSieveState",
+    "PrimeSieveDriver"
+   ],
+   "PrimeSieve.next": [
+    "PrimeSieveState",
+    "PrimeSieveDriver"
+   ],
+   "instPrimeGenPrimeSieve": [
+    "PrimeSieveState",
+    "PrimeSieveDriver"
+   ]
+  },
+  "proofDeps": {
+   "results_exists_prime_gt_of_rakeSieve": [
+    "instPrimeGenPrimeSieve",
+    "RakeSieve.instPrimeSieveStateRakeSieve",
+    "RakeSieve.instPrimeSieveDriverRakeSieve"
+   ],
+   "results_rakeSieve_emits_every_prime": [
+    "instPrimeGenPrimeSieve",
+    "RakeSieve.instPrimeSieveStateRakeSieve",
+    "RakeSieve.instPrimeSieveDriverRakeSieve"
+   ],
+   "results_rakeSieve_step": [
+    "RakeSieve.instPrimeSieveStateRakeSieve",
+    "RakeSieve.instPrimeSieveDriverRakeSieve"
+   ],
+   "results_rakeSieve_never_empty": [
+    "RakeSieve.instPrimeSieveStateRakeSieve",
+    "RakeSieve.instPrimeSieveDriverRakeSieve"
+   ],
+   "simpleGen_exists_prime_gt": [
+    "instPrimeGenSimpleGen"
+   ]
+  }
+ },
+ "sectionVariables": {
+  "PrimeSieve": [
+   "(α : Type)",
+   "[PrimeSieveState α]",
+   "[PrimeSieveDriver α]"
+  ],
+  "PrimeSieve.next": [
+   "(α : Type)",
+   "[PrimeSieveState α]",
+   "[PrimeSieveDriver α]"
+  ],
+  "instPrimeGenPrimeSieve": [
+   "(α : Type)",
+   "[PrimeSieveState α]",
+   "[PrimeSieveDriver α]"
+  ],
+  "Rake.rem": [
+   "(r: Rake)",
+   "{j: Nat}",
+   "(hj: 0<j)"
+  ],
+  "Rake.HasNonMultiple": [
+   "(r: Rake)",
+   "{j: Nat}",
+   "(hj: 0<j)"
+  ]
+ }
+}

@@ -8,7 +8,7 @@ description: >-
 ---
 # proof-site
 
-The rules are in [`docs/CONVENTIONS.md`](../../docs/CONVENTIONS.md). The background is in [`docs/GUIDE.md`](../../docs/GUIDE.md). This file is the procedure. When this file and CONVENTIONS.md disagree, CONVENTIONS.md wins. The reference implementation is `tangentproofs/star-height` `site/`; copy from it rather than writing from scratch.
+The rules are in [`docs/CONVENTIONS.md`](../../docs/CONVENTIONS.md). The background is in [`docs/GUIDE.md`](../../docs/GUIDE.md). This file is the procedure. When this file and CONVENTIONS.md disagree, CONVENTIONS.md wins. The reference implementation is `tangentproofs/star-height` `site/`; copy from it rather than writing from scratch. For a hub-built site (this repo's `engine/`), the worked example is [`examples/rakesieve/`](../../examples/rakesieve/): build it first (README, "Try it") and copy its shape.
 
 ## Ground rules (always)
 

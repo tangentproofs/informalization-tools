@@ -4,6 +4,8 @@
 in [`SKILL.md`](../skill/proof-site/SKILL.md). This document is the why, the architecture, the workflow, and the plan for making
 proof sites a reusable product rather than four hand-maintained copies.
 
+> In this repo, the worked example to start from is [`examples/rakesieve/`](../examples/rakesieve/) (live: [RakeSieve, explained](https://tangentproofs.github.io/rakesieve/learn/)), built with `engine/build.sh`; see the README.
+
 ## 1. What a proof site is for
 
 Formalization usually runs English → Lean and is done when Lean accepts the proof. A tangentproofs proof site

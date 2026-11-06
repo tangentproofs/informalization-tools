@@ -80,6 +80,15 @@ def strip_comments(lines):
     return out
 
 
+def inst_name(header):
+    """inst + class + type heads, e.g. `instance : PrimeGen (PrimeSieve α) where` -> instPrimeGenPrimeSieve."""
+    h = header.split(":", 1)[1] if ":" in header else header
+    h = re.split(r"\swhere\b|:=", h)[0]
+    h = re.sub(r"\([^()]*:=[^()]*\)", "", h)  # named arguments like (α := ASeq)
+    parts = [t.split(".")[-1] for t in TOK.findall(h) if t[0].isupper()]
+    return "inst" + "".join(parts)
+
+
 def scan(file):
     raw = open(os.path.join(ROOT, file), encoding="utf-8").read().split("\n")
     lines = strip_comments(raw)
@@ -91,12 +100,16 @@ def scan(file):
             if ns and ns[-1] == m.group(1): ns.pop()
             starts.append(("end", k)); continue
         if re.match(r"^(section|end|open|variable|universe|set_option|attribute|#|noncomputable section|mutual|import)\b", ln): starts.append(("other", k)); continue
-        if (m := DECL.match(ln)) and not ln.startswith(" "):
+        # "indentedDecls": true in site.json also reads declarations indented inside a `section` (RakeSieve's SimpleGen.lean).
+        if (m := DECL.match(ln.lstrip() if CFG.get("indentedDecls") else ln)) and (CFG.get("indentedDecls") or not ln.startswith(" ")):
             name = m.group(2)
             if name and name.endswith("."): name = name[:-1]  # `theorem foo.{u}`: drop the universe-parameter dot
             if not name:
                 if m.group(1) != "instance": continue
-                anon += 1; name = f"instance_{k + 1}"
+                anon += 1
+                # "instanceNames": "lean" in site.json names an anonymous instance the way Lean most likely
+                # does (inst + class + type heads); otherwise instance_<line>.
+                name = inst_name(" ".join(lines[k:k + 3])) if CFG.get("instanceNames") == "lean" else f"instance_{k + 1}"
             full = name[7:] if name.startswith("_root_.") else ".".join(ns + [name])
             starts.append(("decl", k, m.group(1), full))
         elif raw[k].startswith("/-") or re.match(r"^(example|macro|macro_rules|notation|syntax|elab|scoped|local|infix|infixl|infixr|prefix|postfix|deriving|run_cmd|#)", ln):
@@ -220,6 +233,10 @@ def main():
 
     for d in decls:
         d["statement"], d["proof"] = cut(d["text"], d["kind"])
+        # "shortDefBodies": true in site.json shows short definitions (under 6 lines) with their body,
+        # which reads better on small mathematical libraries (RakeSieve's R, PrimeGt, aseq …)
+        if CFG.get("shortDefBodies") and d["kind"] in ("def", "abbrev") and d["text"].count("\n") < 6:
+            d["statement"] = d["text"].rstrip()
     for d in decls:
         stmt, proof = d["statement"], d["proof"]
         vt = var_types(d); d["vt"] = vt
@@ -253,6 +270,15 @@ def main():
     ids = {d["id"]: d for d in decls}
     for h in HEADS:
         if h not in ids: raise SystemExit(f"headline {h} not found")
+    # Hand-added edges (site.json "manualEdges"): type class instances are found by search, not by name, so
+    # the text scan cannot see that a theorem goes through an instance, or that `variable [C α]` in scope is
+    # part of what a declaration means. Shape: {"proofDeps": {id: [ids]}, "meaningDeps": {id: [ids]}}.
+    for field, edges in CFG.get("manualEdges", {}).items():
+        for k, vs in edges.items():
+            for v in vs:
+                if k not in ids or v not in ids: raise SystemExit(f"manualEdges {field} {k} -> {v}: no such declaration")
+                if v not in ids[k][field]: ids[k][field].append(v)
+                if field == "meaningDeps" and v in ids[k]["proofDeps"]: ids[k]["proofDeps"].remove(v)
     used = {d["id"]: [] for d in decls}
     for e in decls:
         for x in e["meaningDeps"] + e["proofDeps"]: used[x].append(e["id"])
@@ -268,7 +294,7 @@ def main():
     for d in sorted(decls, key=lambda d: d["id"]):
         out.append({"id": d["id"], "name": d["name"], "kind": d["kind"], "file": d["file"],
                     "module": d["file"].rsplit("/", 1)[-1][:-5] if d["file"] else "concepts", "line": d["line"], "endLine": d["endLine"],
-                    "statement": d["statement"], "variables": [], "truncated": False,
+                    "statement": d["statement"], "variables": CFG.get("sectionVariables", {}).get(d["id"], []), "truncated": False,
                     "mathlib": d["mathlib"], "meaningDeps": d["meaningDeps"], "proofDeps": d["proofDeps"],
                     "usedBy": sorted(set(used[d["id"]])), "depth": dist.get(d["id"]), "extracted": False,
                     **({"url": d["url"]} if d["kind"] == "concept" else {})})
