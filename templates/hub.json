@@ -1,0 +1,25 @@
+{
+ "name": "My Lean projects, explained (unofficial)",
+ "baseUrl": "https://OWNER.github.io/REPO/",
+ "repo": "OWNER/REPO",
+ "indexLabel": "Project index",
+ "indexBlurb": "the project index, an independent fan index",
+ "storagePrefix": "my-hub",
+ "credit": "written by Claude (AI)",
+ "aboutCredit": "for [the project index](../)",
+ "giscus": { "repoId": "", "category": "Announcements", "categoryId": "" },
+ "page": {
+  "desc": "Lean projects, each with an unofficial, AI-assisted plain-English explainer.",
+  "brandHtml": "my<span>hub</span> explained",
+  "taglineHtml": "Lean&nbsp;4 projects, each read back into <em>plain English</em>: statements, proof outlines, quizzes.",
+  "navHtml": "",
+  "notesHtml": "<p class=\"fan\"><b>Unofficial.</b> Not affiliated with or endorsed by the projects' authors. Every project belongs to its authors, linked on its card. The explainers are AI-assisted, pinned to one commit each, and may contain errors. Projects without a licence file are explained in prose only.</p>",
+  "projectsHeading": "Projects",
+  "talkLabel": "talk",
+  "talkDefaultUrl": "",
+  "othersHeading": "Others",
+  "othersIntro": "No explainer is planned for:",
+  "suggestHtml": "<p class=\"optout\">Corrections or take-down requests: open an issue.</p>",
+  "footerHtml": ""
+ }
+}

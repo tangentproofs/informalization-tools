@@ -1,0 +1,92 @@
+/* proof-site.css: reference theme tokens and canonical layout for tangentproofs proof sites.
+   Source of truth: star-height site/assets/style.css @ 06ce74a (lines 1-7 tokens, 56-93 node page,
+   188-202 Start here). Sites copy the token block verbatim and the layout rules as needed.
+   See CONVENTIONS.md §9. Colour values MUST match COLORS / PENDING_COLOR in assets/progress.js. */
+
+/* ---- tokens (MUST) ---- */
+:root {
+  --bg: #1e1f1c; --panel: #272822; --panel2: #2f302a; --fg: #f8f8f2; --dim: #a59f85; --line: #3e3d32;
+  --pink: #f92672; --orange: #fd971f; --yellow: #e6db74; --green: #a6e22e; --blue: #66d9ef; --purple: #ae81ff;
+  --unread: #75715e; --explained: #66d9ef;
+  /* progress greens (match COLORS in assets/progress.js): marked understood < quiz passed < both */
+  --signed: #d9f99d; --quiz: #a6e22e; --both: #4caf50; --pending: #ae81ff;
+}
+
+/* ---- base ---- */
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+a { color: var(--blue); text-decoration: none; } a:hover { text-decoration: underline; }
+code, pre, .mono { font-family: "JetBrains Mono", "Fira Code", ui-monospace, Menlo, Consolas, monospace; font-size: 0.92em; }
+code { background: var(--panel2); padding: 0 .25em; border-radius: 3px; }
+
+/* ---- Lean highlighting ---- */
+pre.lean { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--pink); border-radius: 6px; padding: .8rem 1rem; overflow-x: auto; line-height: 1.45; margin: .6rem 0; }
+.lean .kw { color: var(--pink); } .lean .ty { color: var(--blue); font-style: italic; } .lean .num { color: var(--purple); }
+.lean .op { color: var(--pink); } .lean .cm { color: var(--unread); font-style: italic; } .lean .str { color: var(--yellow); }
+.lean .ctor { color: var(--orange); } .lean a.ref { color: var(--green); border-bottom: 1px dotted var(--green); } .lean a.ref:hover { text-decoration: none; background: #3a4a20; }
+.lean .var { color: var(--fg); }
+
+/* ---- node page: side by side, sticky formal column ---- */
+/* Side by side: plain English (left) against the formal statement (right). minmax(0, …) lets wide
+   Lean scroll inside its own box instead of stretching the grid. The formal column sticks below the
+   header while the left column scrolls, and scrolls itself if it is taller than the viewport. */
+.sbs { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 2rem; align-items: start; }
+.sbs > section > :first-child { margin-top: 0; }
+.sbs .eli5 > h2:first-child, .sbs-formal-inner > h2:first-child, .sbs-plain > h2:first-child { margin-top: 1.2rem; }
+.sbs-formal { align-self: stretch; }
+.sbs-formal-inner { position: sticky; top: calc(var(--hdr, 3.2rem) + .5rem); max-height: calc(100vh - var(--hdr, 3.2rem) - 1rem); overflow-y: auto; overscroll-behavior: contain; padding-right: .2rem; }
+.sbs-formal pre.lean { max-width: 100%; }
+.sbs .caveats { margin-top: 1.4rem; }
+.node-head .summary { margin: .6rem 0; max-width: 60rem; }
+.node-head h1 { overflow-wrap: anywhere; }
+details.usedby summary { cursor: pointer; margin: .3rem 0; }
+#content { max-width: 960px; }
+#quiz-head { scroll-margin-top: calc(var(--hdr, 3.2rem) + 1rem); }
+/* Formal statement: each source line is a block that wraps, continuation lines hang 4ch further
+   in than the line's own indentation (--i, set per line by assets/leanlines.js). */
+pre.lean.wrap { white-space: normal; overflow-x: visible; }
+pre.lean.wrap .ln { display: block; white-space: pre-wrap; overflow-wrap: anywhere; padding-left: calc((var(--i, 0) + 4) * 1ch); text-indent: -4ch; }
+
+/* ---- status bar ---- */
+/* Status bar at the top of a node page. --st is the node's progress colour. */
+.topline { display: flex; align-items: center; justify-content: space-between; gap: .6rem 1rem; flex-wrap: wrap; margin: .4rem 0 .2rem; }
+.statusbar { display: flex; align-items: center; gap: .5rem 1rem; flex-wrap: wrap; padding: .4rem .9rem .4rem .7rem; background: var(--panel); border: 1px solid var(--line); border-left: 6px solid var(--st, var(--unread)); border-radius: 8px; }
+.statusbar .sw { width: 1.05rem; height: 1.05rem; border-radius: 50%; background: var(--st, var(--unread)); flex: none; }
+.statusbar .iu { font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: .45rem; }
+.statusbar .iu input { width: 1.15rem; height: 1.15rem; accent-color: var(--both); margin: 0; }
+.statusbar .stars { background: none; border: 0; padding: .1rem .2rem; color: var(--yellow); font-size: 1.1rem; letter-spacing: .06em; line-height: 1.2; }
+.statusbar .stars:hover { border: 0; text-decoration: underline; }
+.statusbar .stars .ct { color: var(--dim); font-size: .85rem; letter-spacing: 0; }
+.statusbar .lbl { font-size: .8rem; color: var(--dim); }
+.stars-inline { color: var(--yellow); letter-spacing: .06em; }
+.status-note:empty { display: none; }
+#widgets:empty { display: none; }
+@media (max-width: 560px) { .topline { flex-direction: column; align-items: stretch; } .statusbar { justify-content: flex-start; } }
+@media (max-width: 800px) {
+  .sbs { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .sbs-formal-inner { position: static; max-height: none; overflow: visible; padding-right: 0; }
+}
+.node-head .name { font-family: ui-monospace, monospace; color: var(--dim); font-size: .9rem; word-break: break-all; }
+
+/* ---- Start here + statement ring ---- */
+/* statement-first: graph legend ring, start link, start page cards */
+.legend span.sw.stmt-ring { background: var(--explained); box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--blue); margin-left: 3px; margin-right: calc(.4em + 3px); }
+a.start-link { display: inline-block; font-weight: 600; padding: .25rem .7rem; border: 1px solid var(--blue); border-radius: 6px; }
+a.start-link:hover { background: #20363c; text-decoration: none; }
+.card { background: var(--panel); border: 1px solid var(--line); border-left: 6px solid var(--st, var(--unread)); border-radius: 8px; padding: .6rem 1rem .4rem; margin: .8rem 0; }
+.card.headline { border-color: #f92672; border-left-color: var(--st); }
+.card-top { display: flex; align-items: center; gap: .4rem .8rem; flex-wrap: wrap; }
+.card-top .sw { width: 1rem; height: 1rem; border-radius: 50%; background: var(--st, var(--unread)); flex: none; }
+.card-top .ttl { font-weight: 700; color: var(--fg); } .card-top .grow { flex: 1; }
+.card-top .iu { font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: .4rem; font-size: .92rem; }
+.card-top .iu input { width: 1.05rem; height: 1.05rem; accent-color: var(--both); margin: 0; }
+.card-top .stars { color: var(--yellow); letter-spacing: .06em; } .card-top .stars .ct { color: var(--dim); font-size: .82rem; letter-spacing: 0; }
+.card .one { margin: .4rem 0; }
+.card pre.lean { margin: .4rem 0 .5rem; }
+.mathlib-gloss li { margin: .35rem 0; }
+
+/* ---- rendered Lean source pages (PROPOSED, CONVENTIONS.md §7) ---- */
+.src .ln-row:target, .src .ln-row.hl { background: #3a3a2a; box-shadow: inset 3px 0 0 var(--orange); }
+.src .ln-row { scroll-margin-top: calc(var(--hdr, 3.2rem) + 2rem); }
+.src .decl-badge { font: .75rem system-ui, sans-serif; padding: 0 .45em; border-radius: 999px; border: 1px solid var(--green); color: var(--green); margin-left: .6em; }
+a.gh { font-size: .8rem; color: var(--dim); } /* the small secondary "view on GitHub" link */

@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/tangentproofs/informalization-tools/docs/site-config.schema.json",
+  "title": "Proof-site configuration (site/site.config.json) — PROPOSED",
+  "description": "Every per-site value of a tangentproofs proof site in one file (CONVENTIONS.md §3). Today these are constants at the top of app.js / build_decls.py / ExtractDecls.lean; star-height values shown as examples.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "title",
+    "repo",
+    "namespace",
+    "modulePrefix",
+    "headlines",
+    "progressKey",
+    "giscus",
+    "siteUrl"
+  ],
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Short site title, e.g. 'Star height ≤ 3, informalized'."
+    },
+    "brandHtml": {
+      "type": "string",
+      "description": "Header brand HTML, e.g. 'star-height <span>≤ 3</span> <em>informalized</em>'."
+    },
+    "siteUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "Canonical URL, e.g. https://tangentproofs.github.io/star-height/ (og:url)."
+    },
+    "repo": {
+      "type": "string",
+      "pattern": "^[^/]+/[^/]+$",
+      "description": "GitHub owner/name, e.g. tangentproofs/star-height."
+    },
+    "branch": {
+      "type": "string",
+      "default": "main"
+    },
+    "siteDir": {
+      "enum": [
+        "site",
+        "learn"
+      ],
+      "default": "site",
+      "description": "Folder holding the site (learn/ only when site/ is taken)."
+    },
+    "leanRoots": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Repo-relative Lean source dirs; CI path filters and source rendering use these."
+    },
+    "namespace": {
+      "type": "string",
+      "description": "Prefix stripped to form node ids, e.g. 'OAI.GeneralizedStarHeight.'."
+    },
+    "modulePrefix": {
+      "type": "string",
+      "description": "Modules counted as the project, e.g. 'OAI.Computability.StarHeight'."
+    },
+    "headlines": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "description": "Headline theorem ids, main first. Red border on the graph; heads of the statement set; cards on #/start."
+    },
+    "conditional": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "description": "Headline id -> names of open hypotheses it is conditional on (shown as CONDITIONAL)."
+    },
+    "mathlibGloss": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Mathlib name -> one-line HTML gloss for the Start here page."
+    },
+    "progressKey": {
+      "type": "string",
+      "description": "localStorage key; never rename once published (e.g. 'star-height-progress-v1')."
+    },
+    "labels": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "understand": {
+          "type": "string",
+          "default": "I think I understand this",
+          "description": "Understanding checkbox label; a short form like 'Understood' is allowed."
+        },
+        "quiz": {
+          "type": "string",
+          "default": "Bonus: check yourself"
+        },
+        "start": {
+          "type": "string",
+          "default": "Start here: what the theorem says"
+        }
+      }
+    },
+    "giscus": {
+      "type": "object",
+      "required": [
+        "repoId",
+        "categoryId"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "repoId": {
+          "type": "string"
+        },
+        "category": {
+          "type": "string",
+          "default": "Announcements"
+        },
+        "categoryId": {
+          "type": "string"
+        },
+        "termPrefix": {
+          "type": "string",
+          "default": "node: "
+        }
+      }
+    },
+    "sourceBase": {
+      "type": "string",
+      "default": "src/",
+      "description": "Where rendered Lean source pages live relative to the site root (eulers-gem: '../docs/')."
+    },
+    "credit": {
+      "type": "string",
+      "description": "Footer credit HTML (author of the proof, licence)."
+    },
+    "trust": {
+      "type": "object",
+      "description": "Data for #/trust: per-headline axiom lists, what was re-checked where.",
+      "additionalProperties": true
+    }
+  }
+}
