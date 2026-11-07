@@ -47,7 +47,7 @@ The Lean is always the ground truth. The English is a guide to it, and the site 
 | `engine/` | the site engine: browser app (`assets/`), build tools (`tools/`), node schema, `gen.py` (per-site config and `index.html` from `site.json`), `build.sh` |
 | `engine/tools/scan_decls.py` | declaration scanner (source text, no Lean build) |
 | `engine/tools/build_site.mjs`, `build_source.mjs` | validate nodes, build the site and the highlighted source pages (Lean, plus a small generic highlighter for other languages via `sourceExts`) |
-| `engine/tools/srcrefs_lock.py` | optional: lock "File.lean lines a–b" references to the text they cite, and re-point them after the Lean changes (needs full repo paths in references) |
+| `engine/tools/srcrefs_lock.py` | optional: lock "File.lean lines a–b" references to the text they cite, and re-point them after the Lean changes. Names resolve the way the build links them (full path or unique suffix); in a hub the lock is `sites/<slug>/srcrefs.lock.json` |
 | `tools/` | hub tools: `update.mjs` renders the hub page from `projects.json` + `hub.json`; `sync_projects.py` records node counts; `mktask.py` prints a drafting task message; `leakcheck.py` finds verbatim source lines in a no-licence site's text |
 | `templates/` | `hub.json`, `projects.json`, a site skeleton (`site/`), hub page CSS and favicon, and the Pages workflow |
 | `examples/rakesieve/` | a complete worked example: the site config, 69 nodes and the About/Review/Trust pages of [RakeSieve, explained](https://tangentproofs.github.io/rakesieve/learn/), for [tangentproofs/rakesieve](https://github.com/tangentproofs/rakesieve) (MIT), a prime sieve with both mathematical proofs (infinitude of primes as a corollary) and proofs about the program (every step emits the next prime) |
@@ -91,7 +91,13 @@ git -C projects/tangentproofs-rakesieve checkout 1c165f93c0292f2c52f88c5325faabb
 (cd engine && npm ci) && pip install pyyaml
 engine/build.sh rakesieve                      # -> _site/rakesieve/
 python3 -m http.server -d _site 8765           # open http://localhost:8765/rakesieve/
+# line references: the example ships a lock; check it against the checkout
+(cd build/rakesieve && LEARN_SRC_ROOT=../../projects/tangentproofs-rakesieve python3 tools/srcrefs_lock.py --check)
 ```
+
+After the Lean changes, `--check` fails on every reference whose lines no longer read the same; `--remap`
+re-points them in `sites/<slug>/nodes_src` and `pages`, then rebuild. It follows "File.lean lines a–b" and
+"line a" references; a bare number after them ("lines 193–198 and 255") is not tracked.
 
 RakeSieve is a good first example: the mathematics is simple (primes, crossing out multiples), and it has
 both kinds of proof. Some are mathematical: there are infinitely many primes, obtained as a corollary of the
